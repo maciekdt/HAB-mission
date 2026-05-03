@@ -1,0 +1,19 @@
+{
+  "folders": [
+    {
+      "name": "samd21_sender",
+      "path": "samd21_sender"
+    },
+    {
+      "name": "telemetry_packet_lib",
+      "path": "telemetry_packet_lib"
+    },
+    {
+      "name": "HAB-mission",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "platformio-ide.autoRebuildAutocompleteIndex": true
+  }
+}

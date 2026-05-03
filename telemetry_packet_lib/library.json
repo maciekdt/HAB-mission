@@ -1,0 +1,12 @@
+{
+  "name": "HAB Telemetry Packet",
+  "version": "0.1.0",
+  "description": "Shared binary telemetry packet encoder/decoder for HAB mission firmware.",
+  "keywords": ["telemetry", "packet", "hab"],
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "includeDir": "include",
+    "srcDir": "src"
+  }
+}
