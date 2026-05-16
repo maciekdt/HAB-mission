@@ -9,8 +9,8 @@
       "path": "telemetry_packet_lib"
     },
     {
-      "name": "HAB-mission",
-      "path": "."
+      "name": "esp32s3_receiver",
+      "path": "esp32s3_receiver"
     }
   ],
   "settings": {
