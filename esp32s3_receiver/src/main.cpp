@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <RadioLib.h>
+#include <SD.h>
 #include <U8g2lib.h>
 #include <Wire.h>
 
@@ -15,10 +16,15 @@ constexpr uint8_t LORA_NSS = 21;
 constexpr uint8_t LORA_RST = 12;
 constexpr uint8_t LORA_BUSY = 13;
 constexpr uint8_t LORA_DIO1 = 14;
-constexpr uint8_t BUZZER_PIN = 3;
+constexpr uint8_t SD_MISO = 3;
+constexpr uint8_t SD_MOSI = 5;
+constexpr uint8_t SD_SCK = 7;
+constexpr uint8_t SD_CS = 18;
+constexpr uint8_t BUZZER_PIN = 9;
 
 SX1262 radio = new Module(LORA_NSS, LORA_DIO1, LORA_RST, LORA_BUSY);
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C display(U8G2_R0, U8X8_PIN_NONE);
+SPIClass sdSpi(HSPI);
 
 volatile bool receivedFlag = false;
 bool radioReady = false;
@@ -90,6 +96,52 @@ void printRadioLibState(const char* label, int state) {
   Serial.println("SX1262 ERROR - check wiring, power, antenna, and SPI pins");
 }
 
+void printSdCardType(uint8_t cardType) {
+  Serial.print("microSD card type: ");
+  if (cardType == CARD_MMC) {
+    Serial.println("MMC");
+  } else if (cardType == CARD_SD) {
+    Serial.println("SDSC");
+  } else if (cardType == CARD_SDHC) {
+    Serial.println("SDHC/SDXC");
+  } else {
+    Serial.println("UNKNOWN");
+  }
+}
+
+bool initMicroSd() {
+  Serial.print("microSD SPI pins: SCK=");
+  Serial.print(SD_SCK);
+  Serial.print(" MISO=");
+  Serial.print(SD_MISO);
+  Serial.print(" MOSI=");
+  Serial.print(SD_MOSI);
+  Serial.print(" CS=");
+  Serial.println(SD_CS);
+
+  pinMode(SD_CS, OUTPUT);
+  digitalWrite(SD_CS, HIGH);
+  sdSpi.begin(SD_SCK, SD_MISO, SD_MOSI, SD_CS);
+
+  if (!SD.begin(SD_CS, sdSpi, 400000)) {
+    Serial.println("microSD ERROR - card mount failed");
+    return false;
+  }
+
+  const uint8_t cardType = SD.cardType();
+  if (cardType == CARD_NONE) {
+    Serial.println("microSD ERROR - no card detected");
+    return false;
+  }
+
+  printSdCardType(cardType);
+  Serial.print("microSD size: ");
+  Serial.print(SD.cardSize() / (1024ULL * 1024ULL));
+  Serial.println(" MB");
+  Serial.println("microSD OK");
+  return true;
+}
+
 void setup() {
   Serial.begin(115200);
   delay(1000);
@@ -110,6 +162,8 @@ void setup() {
   display.setPowerSave(0);
   display.clearDisplay();
   drawSignalStats("BOOT");
+
+  initMicroSd();
 
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_NSS);
 
