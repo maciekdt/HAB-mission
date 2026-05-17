@@ -37,10 +37,10 @@ void onPacketReceived() {
 
 void beepReceivedPacket() {
   for (uint8_t i = 0; i < 2; i++) {
-    tone(BUZZER_PIN, 2500, 80);
-    delay(120);
-    noTone(BUZZER_PIN);
-    delay(80);
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(50);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(50);
   }
 }
 
@@ -101,10 +101,13 @@ void setup() {
   Serial.println("For Seeed Wio-SX1262 RX-only, RF_SW should be tied to 3V3.");
 
   pinMode(BUZZER_PIN, OUTPUT);
-  noTone(BUZZER_PIN);
+  digitalWrite(BUZZER_PIN, LOW);
 
   Wire.begin(OLED_SDA, OLED_SCL);
+  Wire.setClock(100000);
+  delay(100);
   display.begin();
+  display.setPowerSave(0);
   display.clearDisplay();
   drawSignalStats("BOOT");
 
