@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <RadioLib.h>
-#include <SD.h>
+#include <SD_MMC.h>
 #include <U8g2lib.h>
 #include <Wire.h>
 
@@ -16,15 +16,14 @@ constexpr uint8_t LORA_NSS = 21;
 constexpr uint8_t LORA_RST = 12;
 constexpr uint8_t LORA_BUSY = 13;
 constexpr uint8_t LORA_DIO1 = 14;
-constexpr uint8_t SD_MISO = 3;
-constexpr uint8_t SD_MOSI = 5;
-constexpr uint8_t SD_SCK = 7;
-constexpr uint8_t SD_CS = 18;
+constexpr uint8_t SD_D0 = 4;
+constexpr uint8_t SD_CMD = 5;
+constexpr uint8_t SD_CLK = 6;
+constexpr int SDIO_FREQ_KHZ = SDMMC_FREQ_DEFAULT;
 constexpr uint8_t BUZZER_PIN = 9;
 
 SX1262 radio = new Module(LORA_NSS, LORA_DIO1, LORA_RST, LORA_BUSY);
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C display(U8G2_R0, U8X8_PIN_NONE);
-SPIClass sdSpi(HSPI);
 
 volatile bool receivedFlag = false;
 bool radioReady = false;
@@ -110,25 +109,27 @@ void printSdCardType(uint8_t cardType) {
 }
 
 bool initMicroSd() {
-  Serial.print("microSD SPI pins: SCK=");
-  Serial.print(SD_SCK);
-  Serial.print(" MISO=");
-  Serial.print(SD_MISO);
-  Serial.print(" MOSI=");
-  Serial.print(SD_MOSI);
-  Serial.print(" CS=");
-  Serial.println(SD_CS);
+  Serial.print("microSD 1-bit SDIO pins: CLK=");
+  Serial.print(SD_CLK);
+  Serial.print(" CMD=");
+  Serial.print(SD_CMD);
+  Serial.print(" D0=");
+  Serial.print(SD_D0);
+  Serial.print(" FREQ=");
+  Serial.print(SDIO_FREQ_KHZ);
+  Serial.println("kHz");
 
-  pinMode(SD_CS, OUTPUT);
-  digitalWrite(SD_CS, HIGH);
-  sdSpi.begin(SD_SCK, SD_MISO, SD_MOSI, SD_CS);
+  if (!SD_MMC.setPins(SD_CLK, SD_CMD, SD_D0)) {
+    Serial.println("microSD ERROR - SDIO pin setup failed");
+    return false;
+  }
 
-  if (!SD.begin(SD_CS, sdSpi, 400000)) {
+  if (!SD_MMC.begin("/sdcard", true, false, SDIO_FREQ_KHZ)) {
     Serial.println("microSD ERROR - card mount failed");
     return false;
   }
 
-  const uint8_t cardType = SD.cardType();
+  const uint8_t cardType = SD_MMC.cardType();
   if (cardType == CARD_NONE) {
     Serial.println("microSD ERROR - no card detected");
     return false;
@@ -136,7 +137,7 @@ bool initMicroSd() {
 
   printSdCardType(cardType);
   Serial.print("microSD size: ");
-  Serial.print(SD.cardSize() / (1024ULL * 1024ULL));
+  Serial.print(SD_MMC.cardSize() / (1024ULL * 1024ULL));
   Serial.println(" MB");
   Serial.println("microSD OK");
   return true;
@@ -145,12 +146,6 @@ bool initMicroSd() {
 void setup() {
   Serial.begin(115200);
   delay(1000);
-
-  Serial.println();
-  Serial.println("ESP32-S3 SX1262 receiver test");
-  Serial.println("SPI pins: SCK=17 MISO=16 MOSI=15 NSS=21 RST=12 BUSY=13 DIO1=14");
-  Serial.println("OLED I2C pins: SDA=1 SCL=2");
-  Serial.println("For Seeed Wio-SX1262 RX-only, RF_SW should be tied to 3V3.");
 
   pinMode(BUZZER_PIN, OUTPUT);
   digitalWrite(BUZZER_PIN, LOW);
