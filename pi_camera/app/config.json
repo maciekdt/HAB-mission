@@ -1,0 +1,13 @@
+{
+  "output_dir": "~/hab-photos",
+  "interval_seconds": 30,
+  "profiles": [
+    { "exposure_us": null, "gain": null, "ev": 0 },
+    { "exposure_us": 1000, "gain": null, "ev": 0 },
+    { "exposure_us": 500, "gain": null, "ev": 0 },
+    { "exposure_us": 1000, "gain": 1, "ev": 0 },
+    { "exposure_us": 1000, "gain": 4, "ev": 0 },
+    { "exposure_us": 1000, "gain": null, "ev": -1 },
+    { "exposure_us": 1000, "gain": null, "ev": -2 }
+  ]
+}

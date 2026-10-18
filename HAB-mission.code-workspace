@@ -1,19 +1,23 @@
-{
-  "folders": [
-    {
-      "name": "samd21_sender",
-      "path": "samd21_sender"
-    },
-    {
-      "name": "telemetry_packet_lib",
-      "path": "telemetry_packet_lib"
-    },
-    {
-      "name": "esp32s3_receiver",
-      "path": "esp32s3_receiver"
-    }
-  ],
-  "settings": {
-    "platformio-ide.autoRebuildAutocompleteIndex": true
-  }
+﻿{
+    "folders":  [
+                    {
+                        "name":  "samd21_sender",
+                        "path":  "samd21_sender"
+                    },
+                    {
+                        "name":  "telemetry_packet_lib",
+                        "path":  "telemetry_packet_lib"
+                    },
+                    {
+                        "name":  "esp32s3_receiver",
+                        "path":  "esp32s3_receiver"
+                    },
+                    {
+                        "name":  "pi_camera",
+                        "path":  "pi_camera"
+                    }
+                ],
+    "settings":  {
+                     "platformio-ide.autoRebuildAutocompleteIndex":  true
+                 }
 }
